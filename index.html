@@ -168,7 +168,7 @@
 
     <div id="top-bar">
         <div class="top-menu"><span>배경색</span><span>마이페이지</span></div>
-        <div class="top-msg">윤선님이 입장하셨습니다. (목표: 임용 합격!)</div>
+        <div class="top-msg"> =^^= 님이 입장하셨습니다. (목표: 임용 합격!)</div>
         <div class="top-menu"><span>로그아웃</span><span>랭킹</span></div>
     </div>
 
@@ -225,8 +225,9 @@
     </div>
 
     <script>
-        // JS 로직은 클로드와 함께 이어서 완성하세요! 
-        // 카테고리 불러오는 기본 로직만 둡니다.
+        // ---------------------------------------------
+        // 1. 메뉴 초기화 및 연동 로직 (기존 코드)
+        // ---------------------------------------------
         const selSchool = document.getElementById("sel-school");
         const selUnit = document.getElementById("sel-unit");
         const selType = document.getElementById("sel-type");
@@ -270,14 +271,306 @@
         selUnit.addEventListener("change", updateTypes);
         window.onload = initSelects;
 
+        // ---------------------------------------------
+        // 2. 산성비 게임 로직 (클로드가 작성한 코드)
+        // ---------------------------------------------
+        let score = 0;
+        let lives = 5;
+        let gameLoopId = null;       // requestAnimationFrame ID
+        let spawnTimerId = null;     // setInterval ID (단어 생성)
+        let fallingWords = [];       // 현재 화면에 떨어지는 단어 객체 배열
+        let currentMode = 1;
+        let currentItems = [];       // 현재 선택된 성취기준 배열
+        let chunkIndex = 0;          // 모드2 전용: 현재 청킹 인덱스
+        let chunkItemIndex = 0;      // 모드2 전용: 현재 성취기준 인덱스
+
+        const gameArea   = document.getElementById("game-area");
+        const inputWord  = document.getElementById("input-word");
+        const questionEl = document.getElementById("question-text");
+        const scoreEl    = document.getElementById("score-display");
+        const livesEl    = document.getElementById("lives-display");
+        const statusEl   = document.querySelector(".main-status");
+
+        // ---------- 유틸 ----------
+        /** 띄어쓰기·공백 제거 후 비교 */
+        function normalize(str) {
+            return str.replace(/\s/g, "");
+        }
+
+        /** 배열에서 랜덤 요소 */
+        function randFrom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        /** 0~(max-width) 사이 랜덤 X */
+        function randX(width = 80) {
+            return Math.random() * (gameArea.clientWidth - width);
+        }
+
+        // ---------- 화면 리셋 ----------
+        function resetGameScreen() {
+            fallingWords.forEach(w => w.el && w.el.remove());
+            fallingWords = [];
+            chunkIndex = 0;
+            chunkItemIndex = 0;
+            score = 0;
+            lives = 5;
+            scoreEl.textContent = score;
+            livesEl.textContent = lives;
+            cancelAnimationFrame(gameLoopId);
+            clearInterval(spawnTimerId);
+        }
+
+        // ---------- 생명 감소 & 게임오버 ----------
+        function loseLife() {
+            lives--;
+            livesEl.textContent = lives;
+            if (lives <= 0) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            cancelAnimationFrame(gameLoopId);
+            clearInterval(spawnTimerId);
+            fallingWords.forEach(w => w.el && w.el.remove());
+            fallingWords = [];
+            setTimeout(() => {
+                alert(`게임 오버!\n최종 점수: ${score}점`);
+                returnToSetup();
+            }, 100);
+        }
+
+        function returnToSetup() {
+            resetGameScreen();
+            document.getElementById("setup-window").style.display = "block";
+            document.getElementById("game-area").style.display = "none";
+            document.getElementById("typing-area").style.display = "none";
+            statusEl.textContent = "스테이지를 고르고 '플레이'를 눌러 게임을 시작해보세요.";
+        }
+
+        // ---------- 단어 엘리먼트 생성 ----------
+        function createWordEl(displayText, answerText, x) {
+            const el = document.createElement("div");
+            el.className = "falling-word";
+            el.textContent = displayText;
+            el.style.left = x + "px";
+            el.style.top  = "0px";
+            gameArea.appendChild(el);
+
+            return {
+                el,
+                display: displayText,
+                answer: normalize(answerText),
+                y: 0,
+                speed: 0.5 + Math.random() * 0.8   // px/frame
+            };
+        }
+
+        // ---------- 메인 게임 루프 (requestAnimationFrame) ----------
+        function gameLoop() {
+            const bottomLimit = gameArea.clientHeight;
+
+            for (let i = fallingWords.length - 1; i >= 0; i--) {
+                const w = fallingWords[i];
+                w.y += w.speed;
+                w.el.style.top = w.y + "px";
+
+                if (w.y + w.el.offsetHeight >= bottomLimit) {
+                    // 바닥에 닿음
+                    w.el.remove();
+                    fallingWords.splice(i, 1);
+                    loseLife();
+
+                    // 모드2: 못 맞히면 같은 단어 다시 도전
+                    if (currentMode === 2) {
+                        spawnNextChunk();
+                    }
+                }
+            }
+
+            gameLoopId = requestAnimationFrame(gameLoop);
+        }
+
+        // ---------- 입력 판별 ----------
+        inputWord.addEventListener("keydown", function(e) {
+            if (e.key !== "Enter") return;
+            const typed = normalize(this.value);
+            if (!typed) return;
+
+            let matched = false;
+
+            for (let i = fallingWords.length - 1; i >= 0; i--) {
+                const w = fallingWords[i];
+                if (normalize(w.answer) === typed) {
+                    // 정답!
+                    w.el.remove();
+                    fallingWords.splice(i, 1);
+                    score += 10;
+                    scoreEl.textContent = score;
+                    this.value = "";
+                    matched = true;
+
+                    // 모드2: 다음 청크 생성
+                    if (currentMode === 2) {
+                        chunkIndex++;
+                        spawnNextChunk();
+                    }
+                    break;
+                }
+            }
+
+            if (!matched) {
+                // 오답 피드백: 입력창 잠깐 빨간색
+                this.style.background = "#ffcccc";
+                setTimeout(() => { this.style.background = ""; }, 300);
+                this.value = "";
+            }
+        });
+
+        // =============================================
+        // 모드 1: 빈칸 요격
+        // =============================================
+        function startMode1() {
+            currentMode = 1;
+
+            // 선택된 성취기준 전체 blanks 수집
+            const allBlanks = []; // { display, answer, sourceText }
+            currentItems.forEach(item => {
+                item.blanks.forEach(blank => {
+                    allBlanks.push({ display: blank, answer: blank });
+                });
+            });
+
+            if (allBlanks.length === 0) { alert("빈칸 데이터가 없습니다."); returnToSetup(); return; }
+
+            // 하단 UI: 현재 성취기준 빈칸 문장 표시 (첫 번째 항목)
+            updateBlankQuestion();
+
+            let idx = 0;
+            spawnTimerId = setInterval(() => {
+                if (fallingWords.length >= 5) return; // 최대 5개 동시 유지
+                const item = allBlanks[idx % allBlanks.length];
+                fallingWords.push(createWordEl(item.display, item.answer, randX()));
+                idx++;
+            }, 2500);
+
+            gameLoopId = requestAnimationFrame(gameLoop);
+        }
+
+        function updateBlankQuestion() {
+            if (!currentItems.length) return;
+            const item = currentItems[0]; // 첫 성취기준 문장 표시
+            let text = item.fullText;
+            item.blanks.forEach(b => {
+                text = text.replace(new RegExp(b.replace(/\s/g,""), "g"), `[     ]`);
+            });
+            questionEl.textContent = text;
+        }
+
+        // =============================================
+        // 모드 2: 청킹 격파
+        // =============================================
+        function startMode2() {
+            currentMode = 2;
+            chunkItemIndex = 0;
+            chunkIndex = 0;
+            questionEl.textContent = "문장을 완성하세요!";
+            gameLoopId = requestAnimationFrame(gameLoop);
+            spawnNextChunk();
+        }
+
+        function spawnNextChunk() {
+            // 현재 item의 모든 청크를 다 맞혔으면 다음 item으로
+            const item = currentItems[chunkItemIndex];
+            if (!item) {
+                // 모든 성취기준 완료
+                cancelAnimationFrame(gameLoopId);
+                clearInterval(spawnTimerId);
+                setTimeout(() => {
+                    alert(`🎉 모든 청크 완료!\n최종 점수: ${score}점`);
+                    returnToSetup();
+                }, 200);
+                return;
+            }
+
+            if (chunkIndex >= item.chunks.length) {
+                // 이 item 완료, 다음으로
+                chunkItemIndex++;
+                chunkIndex = 0;
+                spawnNextChunk();
+                return;
+            }
+
+            const chunk = item.chunks[chunkIndex];
+            questionEl.textContent = `[${item.id}] (${chunkIndex + 1}/${item.chunks.length}) 번째 청크를 입력하세요`;
+            // 기존 단어 제거 후 새 단어 하나만 생성
+            fallingWords.forEach(w => w.el && w.el.remove());
+            fallingWords = [];
+            fallingWords.push(createWordEl(chunk, chunk, randX()));
+        }
+
+        // =============================================
+        // 모드 3: 초성 비 내리기
+        // =============================================
+        function startMode3() {
+            currentMode = 3;
+            questionEl.textContent = "초성을 보고 단어를 맞혀보세요!";
+
+            // 전체 chosung 쌍 수집
+            const allChosung = [];
+            currentItems.forEach(item => {
+                if (item.chosung) {
+                    Object.entries(item.chosung).forEach(([key, val]) => {
+                        allChosung.push({ display: key, answer: val });
+                    });
+                }
+            });
+
+            if (allChosung.length === 0) { alert("초성 데이터가 없습니다."); returnToSetup(); return; }
+
+            let idx = 0;
+            spawnTimerId = setInterval(() => {
+                if (fallingWords.length >= 6) return;
+                const item = allChosung[idx % allChosung.length];
+                fallingWords.push(createWordEl(item.display, item.answer, randX()));
+                idx++;
+            }, 2200);
+
+            gameLoopId = requestAnimationFrame(gameLoop);
+        }
+
+        // =============================================
+        // startGame() 오버라이드 (HTML의 onclick에 연결)
+        // =============================================
         function startGame() {
+            // 선택값 읽기
+            const school = document.getElementById("sel-school").value;
+            const unit   = document.getElementById("sel-unit").value;
+            const type   = document.getElementById("sel-type").value;
+            currentMode  = parseInt(document.getElementById("sel-mode").value);
+
+            if (typeof db === 'undefined' || !db[school] || !db[school][unit] || !db[school][unit][type]) {
+                alert("데이터를 불러올 수 없습니다. data.js를 확인하세요."); return;
+            }
+
+            currentItems = db[school][unit][type];
+
+            // 화면 전환
             document.getElementById("setup-window").style.display = "none";
-            document.getElementById("game-area").style.display = "block";
-            document.getElementById("typing-area").style.display = "block";
-            document.querySelector(".main-status").innerText = "게임 진행 중... 타자를 치세요!";
-            document.getElementById("input-word").focus();
-            
-            // 이곳부터 클로드와 함께 게임 루프를 완성하세요!
+            document.getElementById("game-area").style.display    = "block";
+            document.getElementById("typing-area").style.display  = "block";
+            statusEl.textContent = "게임 진행 중... 타자를 치세요!";
+            inputWord.value = "";
+            inputWord.focus();
+
+            // 상태 초기화
+            resetGameScreen();
+
+            // 모드별 시작
+            if (currentMode === 1) startMode1();
+            else if (currentMode === 2) startMode2();
+            else if (currentMode === 3) startMode3();
         }
     </script>
 </body>
