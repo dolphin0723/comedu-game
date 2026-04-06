@@ -2,347 +2,282 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>정보과 교육과정 아케이드</title>
+    <title>정보과 교육과정 산성비</title>
     <style>
-        /* 레트로 오락실 폰트 (둥근모꼴) 적용 */
-        @font-face {
-            font-family: 'DungGeunMo';
-            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
-            font-weight: normal;
-            font-style: normal;
+        /* 클래식 윈도우 감성 폰트 */
+        body {
+            font-family: 'Gulim', '돋움', 'Dotum', sans-serif;
+            background-color: #EFEFCA; /* 사진과 비슷한 연한 베이지/노란색 배경 */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        body { 
-            font-family: 'DungGeunMo', sans-serif; 
-            background-color: #111; /* CRT 모니터 같은 어두운 배경 */
-            color: #fff; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+        /* 상단 네비게이션 바 */
+        #top-bar {
+            background-color: #000080; /* 남색 */
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 20px;
+            font-size: 14px;
+            font-weight: bold;
         }
 
-        h1 { 
-            color: #00FF00; 
-            text-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00; /* 네온사인 효과 */
-            margin-top: 20px; 
-            font-size: 36px;
+        .top-menu span { margin-right: 15px; cursor: pointer; }
+        .top-msg { flex-grow: 1; text-align: center; }
+
+        /* 하단 물결 무늬 및 상태 바 */
+        #bottom-area {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        .waves {
+            height: 60px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1000 100" xmlns="http://www.w3.org/2000/svg"><path d="M0,50 Q100,0 200,50 T400,50 T600,50 T800,50 T1000,50 L1000,100 L0,100 Z" fill="%2340c0e0" opacity="0.7"/><path d="M0,70 Q100,20 200,70 T400,70 T600,70 T800,70 T1000,70 L1000,100 L0,100 Z" fill="%2320a0d0"/></svg>') repeat-x;
+            background-size: 500px 100%;
         }
 
-        #menu-bar { 
-            background: #222; 
-            padding: 15px; 
-            border: 2px solid #00FF00;
-            border-radius: 0; /* 각진 레트로 느낌 */
-            margin-bottom: 20px; 
-            display: flex; 
-            gap: 10px; 
-            flex-wrap: wrap; 
-            justify-content: center;
-            box-shadow: 0 0 10px #00FF00;
+        #status-bar {
+            background-color: #C0C0C0;
+            border-top: 2px solid #FFF;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+        #status-bar div {
+            padding: 4px 10px;
+            border-right: 2px solid #808080;
+            border-left: 2px solid #FFF;
+        }
+        #status-bar .main-status { flex-grow: 1; border-left: none; }
+
+        /* 클래식 윈도우 창 UI */
+        .window {
+            background-color: #C0C0C0;
+            border-top: 2px solid #FFF;
+            border-left: 2px solid #FFF;
+            border-right: 2px solid #404040;
+            border-bottom: 2px solid #404040;
+            width: 500px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            z-index: 10;
         }
 
-        select, button { 
-            font-family: 'DungGeunMo', sans-serif;
-            padding: 8px 12px; 
-            font-size: 16px; 
-            border: 1px solid #00FF00; 
-            background: #000; 
-            color: #00FF00; 
+        .window-header {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 3px 5px;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .window-content { padding: 15px; }
+
+        .list-box {
+            background: white;
+            border-top: 2px solid #404040;
+            border-left: 2px solid #404040;
+            border-right: 2px solid #FFF;
+            border-bottom: 2px solid #FFF;
+            height: 150px;
+            margin-bottom: 15px;
+            padding: 5px;
+            overflow-y: scroll;
+        }
+
+        select {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 3px;
+            font-family: 'Gulim';
+        }
+
+        .button-group { text-align: center; margin-top: 15px; }
+        
+        button {
+            background-color: #C0C0C0;
+            border-top: 2px solid #FFF;
+            border-left: 2px solid #FFF;
+            border-right: 2px solid #404040;
+            border-bottom: 2px solid #404040;
+            padding: 5px 20px;
+            font-family: 'Gulim';
+            font-size: 14px;
             cursor: pointer;
+            margin: 0 5px;
+        }
+        button:active {
+            border-top: 2px solid #404040;
+            border-left: 2px solid #404040;
+            border-right: 2px solid #FFF;
+            border-bottom: 2px solid #FFF;
         }
 
-        button { 
-            background: #00FF00; 
-            color: #000; 
-            font-weight: bold; 
+        /* 게임 화면 영역 (시작 시 창은 사라지고 단어가 떨어질 곳) */
+        #game-area {
+            position: absolute;
+            top: 30px;
+            bottom: 60px;
+            left: 0;
+            width: 100%;
+            display: none; /* 초기에는 숨김 */
+        }
+        
+        .falling-word {
+            position: absolute;
+            color: #000080;
+            font-weight: bold;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 2px 5px;
+            border: 1px solid #000080;
         }
 
-        button:hover { 
-            background: #fff; 
-            color: #000;
-            border-color: #fff;
+        #typing-area {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            text-align: center;
         }
-
-        #game-container { width: 800px; position: relative; }
-
-        #question-box { 
-            background: #000; 
-            padding: 15px; 
-            font-size: 20px; 
-            line-height: 1.5; 
-            min-height: 50px; 
-            text-align: center; 
-            margin-bottom: 10px; 
-            border: 2px dashed #FFD700; 
-            color: #FFD700;
+        
+        #input-word {
+            font-family: 'Gulim';
+            font-size: 20px;
+            padding: 5px;
+            width: 300px;
+            border: 2px inset #FFF;
         }
-
-        /* 게임 보드: 백터 그래픽 감성의 테두리 */
-        #game-board { 
-            width: 100%; 
-            height: 400px; 
-            background: #000; 
-            border: 4px solid #00FFFF; 
-            box-shadow: 0 0 15px #00FFFF, inset 0 0 15px #00FFFF;
-            position: relative; 
-            overflow: hidden; 
-        }
-
-        .word { 
-            position: absolute; 
-            color: #FF00FF; /* 마젠타 네온 컬러 */
-            font-weight: bold; 
-            font-size: 22px; 
-            text-shadow: 0 0 5px #FF00FF, 0 0 10px #FF00FF; 
-        }
-
-        #ui-bar { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-top: 10px; 
-            font-size: 24px; 
-        }
-
-        #input-word { 
-            font-family: 'DungGeunMo', sans-serif;
-            width: 100%; 
-            padding: 15px; 
-            font-size: 24px; 
-            text-align: center; 
-            background: #000; 
-            color: #00FF00; 
-            border: 3px solid #00FF00; 
-            margin-top: 10px; 
-            box-sizing: border-box; 
-        }
-        #input-word:focus { outline: none; box-shadow: 0 0 10px #00FF00; }
-
-        .highlight { color: #FFF; text-decoration: underline; }
     </style>
     <script src="data.js"></script>
 </head>
 <body>
 
-    <h1>🕹️ 정보과 교육과정 아케이드</h1>
-    
-    <div id="menu-bar">
-        <select id="sel-school"></select>
-        <select id="sel-unit"></select>
-        <select id="sel-type"></select>
-        <select id="sel-mode">
-            <option value="1">모드 1: 빈칸 요격</option>
-            <option value="2">모드 2: 청킹 격파</option>
-            <option value="3">모드 3: 초성 비 내리기</option>
-        </select>
-        <button onclick="initGame()">INSERT COIN (시작)</button>
+    <div id="top-bar">
+        <div class="top-menu"><span>배경색</span><span>마이페이지</span></div>
+        <div class="top-msg">윤선님이 입장하셨습니다. (목표: 임용 합격!)</div>
+        <div class="top-menu"><span>로그아웃</span><span>랭킹</span></div>
     </div>
 
-    <div id="game-container">
-        <div id="question-box">옵션을 선택하고 INSERT COIN을 눌러주세요.</div>
-        <div id="game-board"></div>
-        <input type="text" id="input-word" placeholder="정답 입력..." disabled autocomplete="off">
-        
-        <div id="ui-bar">
-            <div style="color:#00FFFF; text-shadow: 0 0 5px #00FFFF;">SCORE: <span id="score">0000</span></div>
-            <div style="color:#FF0000; text-shadow: 0 0 5px #FF0000;">LIVES: <span id="lives">♥♥♥</span></div>
+    <div class="window" id="setup-window">
+        <div class="window-header">
+            <span>Select stage</span>
+            <span>X</span>
+        </div>
+        <div class="window-content">
+            <div style="text-align: center; margin-bottom: 10px;">스테이지를 선택하세요!</div>
+            
+            <div class="list-box" id="menu-box">
+                <label>학교급/과목:</label>
+                <select id="sel-school"></select>
+                
+                <label>단원:</label>
+                <select id="sel-unit"></select>
+                
+                <label>유형:</label>
+                <select id="sel-type"></select>
+            </div>
+
+            <div style="text-align: center;">
+                <label>플레이 할 모드를 선택하세요 (1 - 3)</label><br>
+                <select id="sel-mode" style="width: 200px; margin-top: 5px;">
+                    <option value="1">모드 1: 빈칸 요격</option>
+                    <option value="2">모드 2: 청킹 격파</option>
+                    <option value="3">모드 3: 초성 비 내리기</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button onclick="startGame()">플레이</button>
+                <button>만들기</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-area"></div>
+    
+    <div id="typing-area">
+        <div id="question-text" style="background: white; border: 2px solid #404040; padding: 10px; margin-bottom: 10px; font-weight: bold;"></div>
+        <input type="text" id="input-word" placeholder="정답 입력..." autocomplete="off">
+    </div>
+
+    <div id="bottom-area">
+        <div class="waves"></div>
+        <div id="status-bar">
+            <div class="main-status">스테이지를 고르고 '플레이'를 눌러 게임을 시작해보세요.</div>
+            <div>점수: <span id="score-display">0</span></div>
+            <div>생명: <span id="lives-display">5</span></div>
+            <div style="font-weight: bold;">산성비</div>
         </div>
     </div>
 
     <script>
-        // --- 동적 메뉴 연동 로직 ---
+        // JS 로직은 클로드와 함께 이어서 완성하세요! 
+        // 카테고리 불러오는 기본 로직만 둡니다.
         const selSchool = document.getElementById("sel-school");
         const selUnit = document.getElementById("sel-unit");
         const selType = document.getElementById("sel-type");
 
-        // 1. 학교급 세팅
         function initSelects() {
+            if(typeof db === 'undefined') {
+                alert("data.js 파일을 찾을 수 없습니다!"); return;
+            }
             selSchool.innerHTML = "";
             for (let school in db) {
                 let opt = document.createElement("option");
-                opt.value = school;
-                opt.innerText = school;
+                opt.value = school; opt.innerText = school;
                 selSchool.appendChild(opt);
             }
-            updateUnits(); // 학교가 세팅되면 단원 업데이트
+            updateUnits();
         }
 
-        // 2. 단원 세팅
         function updateUnits() {
             let school = selSchool.value;
             selUnit.innerHTML = "";
             for (let unit in db[school]) {
                 let opt = document.createElement("option");
-                opt.value = unit;
-                opt.innerText = unit;
+                opt.value = unit; opt.innerText = unit;
                 selUnit.appendChild(opt);
             }
-            updateTypes(); // 단원이 세팅되면 타입(성취기준 등) 업데이트
+            updateTypes();
         }
 
-        // 3. 타입 세팅
         function updateTypes() {
             let school = selSchool.value;
             let unit = selUnit.value;
             selType.innerHTML = "";
             for (let type in db[school][unit]) {
                 let opt = document.createElement("option");
-                opt.value = type;
-                opt.innerText = type;
+                opt.value = type; opt.innerText = type;
                 selType.appendChild(opt);
             }
         }
 
-        // 선택지가 바뀔 때마다 하위 메뉴 업데이트
         selSchool.addEventListener("change", updateUnits);
         selUnit.addEventListener("change", updateTypes);
-
-        // 페이지가 열리면 메뉴 초기화
         window.onload = initSelects;
 
-        // --- 게임 진행 로직 ---
-        let currentMode = 1;
-        let currentProblem = null;
-        let score = 0, lives = 3;
-        let activeWords = [];
-        let dropInterval;
-        let isPlaying = false;
-        let chunkIndex = 0; 
-
-        const board = document.getElementById("game-board");
-        const qBox = document.getElementById("question-box");
-        const inputField = document.getElementById("input-word");
-
-        function initGame() {
-            let school = selSchool.value;
-            let unit = selUnit.value;
-            let type = selType.value;
-            currentMode = parseInt(document.getElementById("sel-mode").value);
+        function startGame() {
+            document.getElementById("setup-window").style.display = "none";
+            document.getElementById("game-area").style.display = "block";
+            document.getElementById("typing-area").style.display = "block";
+            document.querySelector(".main-status").innerText = "게임 진행 중... 타자를 치세요!";
+            document.getElementById("input-word").focus();
             
-            const problems = db[school][unit][type];
-            if (!problems || problems.length === 0) {
-                alert("해당 카테고리에 데이터가 없습니다! data.js를 확인해주세요.");
-                return;
-            }
-
-            currentProblem = problems[Math.floor(Math.random() * problems.length)];
-            
-            score = 0; lives = 3; chunkIndex = 0;
-            updateUI();
-            board.innerHTML = "";
-            activeWords = [];
-            isPlaying = true;
-            inputField.disabled = false;
-            inputField.focus();
-
-            renderQuestion();
-            clearInterval(dropInterval);
-            dropInterval = setInterval(gameLoop, 100);
-            spawnWord();
-        }
-
-        function renderQuestion() {
-            if(currentMode === 1) {
-                let text = currentProblem.fullText;
-                currentProblem.blanks.forEach(b => {
-                    text = text.replace(b, `<span class='highlight'>[ ${"?".repeat(b.length)} ]</span>`);
-                });
-                qBox.innerHTML = `${currentProblem.id}<br>${text}`;
-            } else if (currentMode === 2) {
-                qBox.innerHTML = `${currentProblem.id}<br>순서대로 떨어지는 문장 덩어리를 타이핑하세요!`;
-            } else if (currentMode === 3) {
-                qBox.innerHTML = `${currentProblem.id}<br>초성을 보고 핵심 키워드를 맞추세요!<br><span style="font-size:16px; color:#aaa;">(${currentProblem.fullText})</span>`;
-            }
-        }
-
-        function spawnWord() {
-            if(!isPlaying) return;
-            let wordText = "";
-            
-            if(currentMode === 1) {
-                wordText = currentProblem.blanks[Math.floor(Math.random() * currentProblem.blanks.length)];
-            } else if (currentMode === 2) {
-                if(chunkIndex >= currentProblem.chunks.length) {
-                    alert("STAGE CLEAR! 완벽합니다!");
-                    initGame(); return;
-                }
-                wordText = currentProblem.chunks[chunkIndex];
-            } else if (currentMode === 3) {
-                const keys = Object.keys(currentProblem.chosung);
-                wordText = keys[Math.floor(Math.random() * keys.length)];
-            }
-
-            createFallingWord(wordText);
-            
-            if(currentMode !== 2) {
-                setTimeout(spawnWord, 2000);
-            }
-        }
-
-        function createFallingWord(text) {
-            const el = document.createElement("div");
-            el.className = "word";
-            el.innerText = text;
-            el.style.left = Math.floor(Math.random() * (board.clientWidth - 150)) + 20 + "px";
-            el.style.top = "0px";
-            board.appendChild(el);
-            activeWords.push({ el: el, text: text, y: 0 });
-        }
-
-        function gameLoop() {
-            for (let i = activeWords.length - 1; i >= 0; i--) {
-                let w = activeWords[i];
-                w.y += (currentMode === 2) ? 1.5 : 2.5; 
-                w.el.style.top = w.y + "px";
-
-                if (w.y > board.clientHeight - 30) {
-                    board.removeChild(w.el);
-                    activeWords.splice(i, 1);
-                    lives--;
-                    updateUI();
-                    
-                    if(lives <= 0) {
-                        isPlaying = false;
-                        alert("GAME OVER! 계속 도전하세요.");
-                    } else if (currentMode === 2) {
-                        createFallingWord(currentProblem.chunks[chunkIndex]);
-                    }
-                }
-            }
-        }
-
-        inputField.addEventListener("keypress", function(e) {
-            if(e.key === "Enter" && isPlaying) {
-                let typed = inputField.value.trim().replace(/\s+/g, ""); 
-                inputField.value = "";
-
-                for (let i = 0; i < activeWords.length; i++) {
-                    let targetWord = activeWords[i].text;
-                    let isCorrect = false;
-
-                    if(currentMode === 1 && targetWord === typed) isCorrect = true;
-                    if(currentMode === 2 && targetWord === typed) isCorrect = true;
-                    if(currentMode === 3 && currentProblem.chosung[targetWord] === typed) isCorrect = true; 
-
-                    if(isCorrect) {
-                        board.removeChild(activeWords[i].el);
-                        activeWords.splice(i, 1);
-                        score += 100;
-                        updateUI();
-                        
-                        if(currentMode === 2) {
-                            chunkIndex++;
-                            spawnWord(); 
-                        }
-                        break;
-                    }
-                }
-            }
-        });
-
-        function updateUI() {
-            document.getElementById("score").innerText = score.toString().padStart(4, '0');
-            document.getElementById("lives").innerText = "♥".repeat(Math.max(0, lives));
+            // 이곳부터 클로드와 함께 게임 루프를 완성하세요!
         }
     </script>
 </body>
