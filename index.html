@@ -18,6 +18,7 @@
         #input-word { width: 100%; padding: 15px; font-size: 18px; text-align: center; background: #fff; color: #000; border: none; border-radius: 5px; margin-top: 10px; box-sizing: border-box; }
         .highlight { color: #FFD700; text-decoration: underline; }
     </style>
+    <script src="data.js"></script>
 </head>
 <body>
 
@@ -59,29 +60,6 @@
     </div>
 
     <script>
-        // AI가 파싱한 교육과정 DB (예시: 중학교 - 컴퓨팅 시스템 - 성취기준)
-        const db = {
-            "중학교": {
-                "컴퓨팅시스템": {
-                    "성취기준": [
-                        {
-                            id: "[9정01-01]",
-                            fullText: "컴퓨팅 시스템의 구성요소와 동작 원리를 이해하고, 운영 체제의 기능을 분석한다.",
-                            blanks: ["구성요소", "운영체제"], // 모드 1 정답
-                            chunks: ["컴퓨팅시스템의", "구성요소와", "동작원리를", "이해하고", "운영체제의", "기능을", "분석한다"], // 모드 2 정답 (순서대로)
-                            chosung: {"ㄱㅅㅇㅅ": "구성요소", "ㅇㅇㅊㅈ": "운영체제", "ㄷㅈㅇㄹ": "동작원리"} // 모드 3 정답
-                        },
-                        {
-                            id: "[9정01-02]",
-                            fullText: "피지컬 컴퓨팅의 개념을 이해하고, 생활 속에서 적용된 사례 조사를 통해 컴퓨팅 시스템의 필요성과 가치를 판단한다.",
-                            blanks: ["피지컬컴퓨팅", "가치"],
-                            chunks: ["피지컬", "컴퓨팅의", "개념을", "이해하고", "생활속에서", "적용된사례"],
-                            chosung: {"ㅍㅈㅋㅋㅍㅌ": "피지컬컴퓨팅", "ㄱㅊ": "가치"}
-                        }
-                    ]
-                }
-            }
-        };
 
         let currentMode = 1;
         let currentProblem = null;
