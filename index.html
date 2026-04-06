@@ -2,83 +2,229 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>정보과 교육과정 마스터</title>
+    <title>정보과 교육과정 아케이드</title>
     <style>
-        body { font-family: 'Malgun Gothic', sans-serif; background-color: #1e1e1e; color: #fff; margin: 0; display: flex; flex-direction: column; align-items: center; }
-        h1 { color: #4CAF50; margin-top: 20px; }
-        #menu-bar { background: #333; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        select, button { padding: 8px 12px; font-size: 14px; border-radius: 5px; border: 1px solid #555; background: #222; color: #fff; }
-        button { background: #4CAF50; cursor: pointer; font-weight: bold; border: none; }
-        button:hover { background: #45a049; }
+        /* 레트로 오락실 폰트 (둥근모꼴) 적용 */
+        @font-face {
+            font-family: 'DungGeunMo';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body { 
+            font-family: 'DungGeunMo', sans-serif; 
+            background-color: #111; /* CRT 모니터 같은 어두운 배경 */
+            color: #fff; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        h1 { 
+            color: #00FF00; 
+            text-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00; /* 네온사인 효과 */
+            margin-top: 20px; 
+            font-size: 36px;
+        }
+
+        #menu-bar { 
+            background: #222; 
+            padding: 15px; 
+            border: 2px solid #00FF00;
+            border-radius: 0; /* 각진 레트로 느낌 */
+            margin-bottom: 20px; 
+            display: flex; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+            justify-content: center;
+            box-shadow: 0 0 10px #00FF00;
+        }
+
+        select, button { 
+            font-family: 'DungGeunMo', sans-serif;
+            padding: 8px 12px; 
+            font-size: 16px; 
+            border: 1px solid #00FF00; 
+            background: #000; 
+            color: #00FF00; 
+            cursor: pointer;
+        }
+
+        button { 
+            background: #00FF00; 
+            color: #000; 
+            font-weight: bold; 
+        }
+
+        button:hover { 
+            background: #fff; 
+            color: #000;
+            border-color: #fff;
+        }
+
         #game-container { width: 800px; position: relative; }
-        #question-box { background: #2c3e50; padding: 15px; border-radius: 8px; font-size: 18px; line-height: 1.5; min-height: 50px; text-align: center; margin-bottom: 10px; border: 2px solid #34495e; }
-        #game-board { width: 100%; height: 400px; background: #000; border: 3px solid #4CAF50; position: relative; overflow: hidden; border-radius: 8px; }
-        .word { position: absolute; color: #00FF00; font-weight: bold; font-size: 18px; text-shadow: 0 0 5px #00FF00; }
-        #ui-bar { display: flex; justify-content: space-between; margin-top: 10px; font-size: 18px; font-weight: bold; }
-        #input-word { width: 100%; padding: 15px; font-size: 18px; text-align: center; background: #fff; color: #000; border: none; border-radius: 5px; margin-top: 10px; box-sizing: border-box; }
-        .highlight { color: #FFD700; text-decoration: underline; }
+
+        #question-box { 
+            background: #000; 
+            padding: 15px; 
+            font-size: 20px; 
+            line-height: 1.5; 
+            min-height: 50px; 
+            text-align: center; 
+            margin-bottom: 10px; 
+            border: 2px dashed #FFD700; 
+            color: #FFD700;
+        }
+
+        /* 게임 보드: 백터 그래픽 감성의 테두리 */
+        #game-board { 
+            width: 100%; 
+            height: 400px; 
+            background: #000; 
+            border: 4px solid #00FFFF; 
+            box-shadow: 0 0 15px #00FFFF, inset 0 0 15px #00FFFF;
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        .word { 
+            position: absolute; 
+            color: #FF00FF; /* 마젠타 네온 컬러 */
+            font-weight: bold; 
+            font-size: 22px; 
+            text-shadow: 0 0 5px #FF00FF, 0 0 10px #FF00FF; 
+        }
+
+        #ui-bar { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-top: 10px; 
+            font-size: 24px; 
+        }
+
+        #input-word { 
+            font-family: 'DungGeunMo', sans-serif;
+            width: 100%; 
+            padding: 15px; 
+            font-size: 24px; 
+            text-align: center; 
+            background: #000; 
+            color: #00FF00; 
+            border: 3px solid #00FF00; 
+            margin-top: 10px; 
+            box-sizing: border-box; 
+        }
+        #input-word:focus { outline: none; box-shadow: 0 0 10px #00FF00; }
+
+        .highlight { color: #FFF; text-decoration: underline; }
     </style>
     <script src="data.js"></script>
 </head>
 <body>
 
-    <h1>🚀 정보과 교육과정 마스터</h1>
+    <h1>🕹️ 정보과 교육과정 아케이드</h1>
     
     <div id="menu-bar">
-        <select id="sel-school">
-            <option value="중학교">공통 (중학교 정보)</option>
-            <option value="고등학교_일반">일반 선택 (고등학교 정보)</option>
-        </select>
-        <select id="sel-unit">
-            <option value="컴퓨팅시스템">1. 컴퓨팅 시스템</option>
-            <option value="데이터">2. 데이터</option>
-        </select>
-        <select id="sel-type">
-            <option value="성취기준">성취기준</option>
-            <option value="해설">성취기준 해설</option>
-            <option value="고려사항">적용 시 고려사항</option>
-        </select>
+        <select id="sel-school"></select>
+        <select id="sel-unit"></select>
+        <select id="sel-type"></select>
         <select id="sel-mode">
             <option value="1">모드 1: 빈칸 요격</option>
             <option value="2">모드 2: 청킹 격파</option>
             <option value="3">모드 3: 초성 비 내리기</option>
         </select>
-        <button onclick="initGame()">게임 시작</button>
+        <button onclick="initGame()">INSERT COIN (시작)</button>
     </div>
 
     <div id="game-container">
-        <div id="question-box">카테고리와 모드를 선택하고 게임 시작을 눌러주세요.</div>
-        
+        <div id="question-box">옵션을 선택하고 INSERT COIN을 눌러주세요.</div>
         <div id="game-board"></div>
-        
-        <input type="text" id="input-word" placeholder="정답을 입력하세요!" disabled autocomplete="off">
+        <input type="text" id="input-word" placeholder="정답 입력..." disabled autocomplete="off">
         
         <div id="ui-bar">
-            <div style="color:#FFD700">점수: <span id="score">0</span></div>
-            <div style="color:#FF6B6B">생명: <span id="lives">3</span></div>
+            <div style="color:#00FFFF; text-shadow: 0 0 5px #00FFFF;">SCORE: <span id="score">0000</span></div>
+            <div style="color:#FF0000; text-shadow: 0 0 5px #FF0000;">LIVES: <span id="lives">♥♥♥</span></div>
         </div>
     </div>
 
     <script>
+        // --- 동적 메뉴 연동 로직 ---
+        const selSchool = document.getElementById("sel-school");
+        const selUnit = document.getElementById("sel-unit");
+        const selType = document.getElementById("sel-type");
 
+        // 1. 학교급 세팅
+        function initSelects() {
+            selSchool.innerHTML = "";
+            for (let school in db) {
+                let opt = document.createElement("option");
+                opt.value = school;
+                opt.innerText = school;
+                selSchool.appendChild(opt);
+            }
+            updateUnits(); // 학교가 세팅되면 단원 업데이트
+        }
+
+        // 2. 단원 세팅
+        function updateUnits() {
+            let school = selSchool.value;
+            selUnit.innerHTML = "";
+            for (let unit in db[school]) {
+                let opt = document.createElement("option");
+                opt.value = unit;
+                opt.innerText = unit;
+                selUnit.appendChild(opt);
+            }
+            updateTypes(); // 단원이 세팅되면 타입(성취기준 등) 업데이트
+        }
+
+        // 3. 타입 세팅
+        function updateTypes() {
+            let school = selSchool.value;
+            let unit = selUnit.value;
+            selType.innerHTML = "";
+            for (let type in db[school][unit]) {
+                let opt = document.createElement("option");
+                opt.value = type;
+                opt.innerText = type;
+                selType.appendChild(opt);
+            }
+        }
+
+        // 선택지가 바뀔 때마다 하위 메뉴 업데이트
+        selSchool.addEventListener("change", updateUnits);
+        selUnit.addEventListener("change", updateTypes);
+
+        // 페이지가 열리면 메뉴 초기화
+        window.onload = initSelects;
+
+        // --- 게임 진행 로직 ---
         let currentMode = 1;
         let currentProblem = null;
         let score = 0, lives = 3;
         let activeWords = [];
         let dropInterval;
         let isPlaying = false;
-        let chunkIndex = 0; // 모드2 용 인덱스
+        let chunkIndex = 0; 
 
         const board = document.getElementById("game-board");
         const qBox = document.getElementById("question-box");
         const inputField = document.getElementById("input-word");
 
         function initGame() {
-            // 선택된 카테고리 가져오기 (프로토타입은 중학교-컴퓨팅-성취기준만 작동)
+            let school = selSchool.value;
+            let unit = selUnit.value;
+            let type = selType.value;
             currentMode = parseInt(document.getElementById("sel-mode").value);
             
-            // 문제 하나 랜덤 세팅
-            const problems = db["중학교"]["컴퓨팅시스템"]["성취기준"];
+            const problems = db[school][unit][type];
+            if (!problems || problems.length === 0) {
+                alert("해당 카테고리에 데이터가 없습니다! data.js를 확인해주세요.");
+                return;
+            }
+
             currentProblem = problems[Math.floor(Math.random() * problems.length)];
             
             score = 0; lives = 3; chunkIndex = 0;
@@ -97,18 +243,15 @@
 
         function renderQuestion() {
             if(currentMode === 1) {
-                // 빈칸 모드
                 let text = currentProblem.fullText;
                 currentProblem.blanks.forEach(b => {
                     text = text.replace(b, `<span class='highlight'>[ ${"?".repeat(b.length)} ]</span>`);
                 });
-                qBox.innerHTML = `<strong>${currentProblem.id}</strong><br>${text}`;
+                qBox.innerHTML = `${currentProblem.id}<br>${text}`;
             } else if (currentMode === 2) {
-                // 청킹 모드
-                qBox.innerHTML = `<strong>${currentProblem.id}</strong><br>순서대로 떨어지는 문장 덩어리를 타이핑하세요!`;
+                qBox.innerHTML = `${currentProblem.id}<br>순서대로 떨어지는 문장 덩어리를 타이핑하세요!`;
             } else if (currentMode === 3) {
-                // 초성 모드
-                qBox.innerHTML = `<strong>${currentProblem.id}</strong><br>다음 성취기준의 핵심 키워드는?<br><span style="font-size:14px; color:#aaa;">(${currentProblem.fullText})</span>`;
+                qBox.innerHTML = `${currentProblem.id}<br>초성을 보고 핵심 키워드를 맞추세요!<br><span style="font-size:16px; color:#aaa;">(${currentProblem.fullText})</span>`;
             }
         }
 
@@ -117,24 +260,20 @@
             let wordText = "";
             
             if(currentMode === 1) {
-                // 빈칸 요격: 정답 중 하나 랜덤 드롭
                 wordText = currentProblem.blanks[Math.floor(Math.random() * currentProblem.blanks.length)];
             } else if (currentMode === 2) {
-                // 청킹 격파: 배열 순서대로 드롭
                 if(chunkIndex >= currentProblem.chunks.length) {
-                    alert("문장 완성! 성공!");
+                    alert("STAGE CLEAR! 완벽합니다!");
                     initGame(); return;
                 }
                 wordText = currentProblem.chunks[chunkIndex];
             } else if (currentMode === 3) {
-                // 초성 비: 초성을 드롭
                 const keys = Object.keys(currentProblem.chosung);
                 wordText = keys[Math.floor(Math.random() * keys.length)];
             }
 
             createFallingWord(wordText);
             
-            // 모드2가 아니면 계속 랜덤 단어 생성 (모드2는 단어 하나씩)
             if(currentMode !== 2) {
                 setTimeout(spawnWord, 2000);
             }
@@ -144,7 +283,7 @@
             const el = document.createElement("div");
             el.className = "word";
             el.innerText = text;
-            el.style.left = Math.floor(Math.random() * (board.clientWidth - 100)) + 10 + "px";
+            el.style.left = Math.floor(Math.random() * (board.clientWidth - 150)) + 20 + "px";
             el.style.top = "0px";
             board.appendChild(el);
             activeWords.push({ el: el, text: text, y: 0 });
@@ -153,7 +292,7 @@
         function gameLoop() {
             for (let i = activeWords.length - 1; i >= 0; i--) {
                 let w = activeWords[i];
-                w.y += (currentMode === 2) ? 1.5 : 2.5; // 청킹 모드는 약간 느리게
+                w.y += (currentMode === 2) ? 1.5 : 2.5; 
                 w.el.style.top = w.y + "px";
 
                 if (w.y > board.clientHeight - 30) {
@@ -164,9 +303,8 @@
                     
                     if(lives <= 0) {
                         isPlaying = false;
-                        alert("게임 오버! 다시 도전하세요.");
+                        alert("GAME OVER! 계속 도전하세요.");
                     } else if (currentMode === 2) {
-                        // 청킹 모드에서 놓치면 같은 단어 다시 생성
                         createFallingWord(currentProblem.chunks[chunkIndex]);
                     }
                 }
@@ -175,7 +313,7 @@
 
         inputField.addEventListener("keypress", function(e) {
             if(e.key === "Enter" && isPlaying) {
-                let typed = inputField.value.trim().replace(/\s+/g, ""); // 띄어쓰기 무시
+                let typed = inputField.value.trim().replace(/\s+/g, ""); 
                 inputField.value = "";
 
                 for (let i = 0; i < activeWords.length; i++) {
@@ -184,17 +322,17 @@
 
                     if(currentMode === 1 && targetWord === typed) isCorrect = true;
                     if(currentMode === 2 && targetWord === typed) isCorrect = true;
-                    if(currentMode === 3 && currentProblem.chosung[targetWord] === typed) isCorrect = true; // 초성에 맞는 정답 쳤는지 확인
+                    if(currentMode === 3 && currentProblem.chosung[targetWord] === typed) isCorrect = true; 
 
                     if(isCorrect) {
                         board.removeChild(activeWords[i].el);
                         activeWords.splice(i, 1);
-                        score += 10;
+                        score += 100;
                         updateUI();
                         
                         if(currentMode === 2) {
                             chunkIndex++;
-                            spawnWord(); // 다음 단어 생성
+                            spawnWord(); 
                         }
                         break;
                     }
@@ -203,8 +341,8 @@
         });
 
         function updateUI() {
-            document.getElementById("score").innerText = score;
-            document.getElementById("lives").innerText = lives;
+            document.getElementById("score").innerText = score.toString().padStart(4, '0');
+            document.getElementById("lives").innerText = "♥".repeat(Math.max(0, lives));
         }
     </script>
 </body>
